@@ -3,11 +3,11 @@ import math
 
 pygame.init()
 
-screen = pygame.display.set_mode([500, 500])
+screen = pygame.display.set_mode([1280, 720])
 
 points = [[]]
 brush_sizes = [3]
-brush_color = (0,0,0)
+brush_colors = [(0,0,0)]
 
 class Shape:
     def display(self, pos, scale, color):
@@ -22,11 +22,14 @@ class Minus(Shape):
     def display(self, pos, scale, color):
         pygame.draw.rect(screen, color, pygame.Rect(float(pos.x), float(pos.y + 5 * scale - scale/2), float(scale * 10), float(scale)))
 
+class Circle(Shape):
+    def display(self, pos, scale, color):
+        pygame.draw.circle(screen, color, pos + pygame.Vector2(scale, scale), scale)
 
 class Button:
 
     # pos is Vector2, scale is float, shape is Shape object, color is pygame color, hitbox is Vector2
-    def __init__(self, pos, scale, shape, color, hitbox):
+    def __init__(self, pos: pygame.Vector2, scale: int, shape: Shape, color: tuple, hitbox: pygame.Vector2):
         self.pos = pos
         self.scale = scale
         self.shape = shape
@@ -54,12 +57,17 @@ def map_range(value, start1, stop1, start2, stop2):
 # Buttons
 plus_button = Button(pygame.Vector2(10, 10), 3, Plus(), (0,0,0), pygame.Vector2(30,30))
 minus_button = Button(pygame.Vector2(45, 10), 3, Minus(), (0,0,0), pygame.Vector2(30, 30))
+black_button = Button(pygame.Vector2(80, 10), 15, Circle(), (0,0,0), pygame.Vector2(30, 30))
+red_button = Button(pygame.Vector2(115, 10), 15, Circle(), (255,0,0), pygame.Vector2(30, 30))
+green_button = Button(pygame.Vector2(150, 10), 15, Circle(), (0,255,0), pygame.Vector2(30, 30))
+blue_button = Button(pygame.Vector2(185, 10), 15, Circle(), (0,0,255), pygame.Vector2(30, 30))
+white_button = Button(pygame.Vector2(185, 10), 15, Circle(), (255,255,255), pygame.Vector2(30, 30))
 
 
 running = True
 while running:
 
-    # let user quit
+    # event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -68,6 +76,16 @@ while running:
                 brush_sizes[-1] += 1
             if minus_button.mouse_over():
                 brush_sizes[-1] -= 1
+            if black_button.mouse_over():
+                brush_colors[-1] = (0,0,0)
+            if red_button.mouse_over():
+                brush_colors[-1] = (255,0,0)
+            if green_button.mouse_over():
+                brush_colors[-1] = (0,255,0)
+            if blue_button.mouse_over():
+                brush_colors[-1] = (0,0,255)
+            if white_button.mouse_over():
+                brush_colors[-1] = (255,255,255)
 
     # easy to use variables
     width = pygame.display.get_surface().get_width()
@@ -84,23 +102,30 @@ while running:
     elif points[-1] != []:
         points.append([])
         brush_sizes.append(brush_sizes[-1])
+        brush_colors.append(brush_colors[-1])
 
 
     # display brushstrokes
-    for pointlist, brush_size in zip(points, brush_sizes):
+    for pointlist, brush_size, brush_color in zip(points, brush_sizes, brush_colors):
          for point1, point2 in zip(pointlist, pointlist[1:]):
              dist = point1.distance_to(point2)
              for i in range(0, int(dist)):
                 pos = pygame.Vector2(map_range(i, 0, dist, point1.x, point2.x), map_range(i, 0, dist, point1.y, point2.y))
-                pygame.draw.circle(screen, (0,0,0), pos, brush_size)
+                pygame.draw.circle(screen, brush_color, pos, brush_size)
 
     #display button tray
     pygame.draw.rect(screen, (200,200,200), pygame.Rect(0, 0, width, 50))
     plus_button.display()
     minus_button.display()
+    black_button.display()
+    red_button.display()
+    green_button.display()
+    green_button.display()
+    blue_button.display()
+    white_button.display()
 
     #display mouse brush
-    pygame.draw.circle(screen, (0,0,0), mousePos, brush_sizes[-1])
+    pygame.draw.circle(screen, brush_colors[-1], mousePos, brush_sizes[-1])
     
     # Flip the display
     pygame.display.flip()
