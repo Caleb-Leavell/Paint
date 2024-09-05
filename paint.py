@@ -1,4 +1,5 @@
 import pygame
+import pygame.gfxdraw
 import math
 
 pygame.init()
@@ -24,7 +25,9 @@ class Minus(Shape):
 
 class Circle(Shape):
     def display(self, pos, scale, color):
-        pygame.draw.circle(screen, color, pos + pygame.Vector2(scale, scale), scale)
+        pygame.gfxdraw.filled_circle(screen, int(pos.x + scale), int(pos.y + scale), scale, color)
+        pygame.gfxdraw.aacircle(screen, int(pos.x + scale), int(pos.y + scale), scale, color)
+
 
 class Button:
 
@@ -61,7 +64,8 @@ black_button = Button(pygame.Vector2(80, 10), 15, Circle(), (0,0,0), pygame.Vect
 red_button = Button(pygame.Vector2(115, 10), 15, Circle(), (255,0,0), pygame.Vector2(30, 30))
 green_button = Button(pygame.Vector2(150, 10), 15, Circle(), (0,255,0), pygame.Vector2(30, 30))
 blue_button = Button(pygame.Vector2(185, 10), 15, Circle(), (0,0,255), pygame.Vector2(30, 30))
-white_button = Button(pygame.Vector2(185, 10), 15, Circle(), (255,255,255), pygame.Vector2(30, 30))
+white_button = Button(pygame.Vector2(220, 10), 15, Circle(), (255,255,255), pygame.Vector2(30, 30))
+
 
 
 running = True
@@ -95,13 +99,14 @@ while running:
     # background
     screen.fill((255, 255, 255))
 
-    # get user input
+    # adding positions to brush if mouse held down
     mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
     if pygame.mouse.get_pressed()[0] and pygame.mouse.get_pos()[1] > 50:
         points[-1].append(mousePos)
     elif points[-1] != []:
         points.append([])
         brush_sizes.append(brush_sizes[-1])
+        brush_colors.append(brush_colors[-1])
         brush_colors.append(brush_colors[-1])
 
 
@@ -111,7 +116,8 @@ while running:
              dist = point1.distance_to(point2)
              for i in range(0, int(dist)):
                 pos = pygame.Vector2(map_range(i, 0, dist, point1.x, point2.x), map_range(i, 0, dist, point1.y, point2.y))
-                pygame.draw.circle(screen, brush_color, pos, brush_size)
+                pygame.gfxdraw.aacircle(screen, int(pos.x), int(pos.y), brush_size, brush_color)
+                pygame.gfxdraw.filled_circle(screen, int(pos.x), int(pos.y), brush_size, brush_color)
 
     #display button tray
     pygame.draw.rect(screen, (200,200,200), pygame.Rect(0, 0, width, 50))
