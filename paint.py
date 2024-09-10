@@ -24,6 +24,19 @@ undo_stack = deque()
 def map_range(value, start1, stop1, start2, stop2):
    return (value - start1) / (stop1 - start1) * (stop2 - start2) + start2
 
+def draw_line_with_circles(point1, point2, radius, color):
+        dist = point1.distance_to(point2)
+        for i in range(0, int(dist)):
+            pos = pygame.Vector2(map_range(i, 0, dist, point1.x, point2.x), map_range(i, 0, dist, point1.y, point2.y))
+            pygame.gfxdraw.aacircle(screen, int(pos.x), int(pos.y), radius, color)
+            pygame.gfxdraw.filled_circle(screen, int(pos.x), int(pos.y), radius, color)
+
+def display_strokes(strokes):
+        for curr_stroke in strokes:
+            for point1, point2 in zip(curr_stroke['points'], curr_stroke['points'][1:]):
+                draw_line_with_circles(point1, point2, curr_stroke['brush_size'], curr_stroke['brush_color'])
+
+
 # Buttons
 
 start = 10
@@ -39,7 +52,11 @@ undo_button = button.Button(pygame.Vector2(pygame.display.get_surface().get_widt
 redo_button = button.Button(pygame.Vector2(pygame.display.get_surface().get_width() - 50, 10), 20, shape.Arrow_Forward(), (0,0,0), pygame.Vector2(30,30))
 
 
+#setup
+background_color = (255, 255, 255)
+screen.fill((255, 255, 255))
 
+#loop
 running = True
 while running:
 
@@ -66,9 +83,15 @@ while running:
                 if len(strokes) >= 2:
                     undo_stack.append(strokes[-2])
                     del strokes[-2]
+                    screen.fill(background_color)
+                    display_strokes(strokes)
             if redo_button.mouse_over():
                 if(len(undo_stack) >= 1):
                     strokes.insert(-2, undo_stack.pop())
+                screen.fill(background_color)
+                display_strokes(strokes)
+
+
                 
                 
 
@@ -77,28 +100,21 @@ while running:
     height = pygame.display.get_surface().get_height()
     mouse_pos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
 
-    # background
-    screen.fill((255, 255, 255))
+    # background - turned off to allow for dynamic rendering, improving performance
 
     # adding positions to brush if mouse held down
     mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
     if pygame.mouse.get_pressed()[0] and mouse_pos.y > 50:
         stroke['points'].append(mouse_pos)
         strokes[-1] = copy.deepcopy(stroke)
+        undo_stack.clear()
     elif len(strokes[-1]['points']) >= 1:
         strokes.append(copy.deepcopy(stroke))
         strokes[-1]['points'] = []
         stroke['points'] = []
-
-    # display brushstrokes
-    for curr_stroke in strokes:
-        for point1, point2 in zip(curr_stroke['points'], curr_stroke['points'][1:]):
-            dist = point1.distance_to(point2)
-            for i in range(0, int(dist)):
-                pos = pygame.Vector2(map_range(i, 0, dist, point1.x, point2.x), map_range(i, 0, dist, point1.y, point2.y))
-                pygame.gfxdraw.aacircle(screen, int(pos.x), int(pos.y), curr_stroke['brush_size'], curr_stroke['brush_color'])
-                pygame.gfxdraw.filled_circle(screen, int(pos.x), int(pos.y), curr_stroke['brush_size'], curr_stroke['brush_color'])
         
+    if(len(stroke['points']) >= 2):
+        draw_line_with_circles(stroke['points'][-2], stroke['points'][-1], stroke['brush_size'], stroke['brush_color'])
 
     #display button tray
     pygame.draw.rect(screen, (200,200,200), pygame.Rect(0, 0, width, 50))
@@ -114,7 +130,8 @@ while running:
     redo_button.display(screen)
 
     #display mouse brush
-    pygame.draw.circle(screen, stroke['brush_color'], mousePos, stroke['brush_size'])
+    if mouse_pos.y < 50 - stroke['brush_size']:
+        pygame.draw.circle(screen, stroke['brush_color'], mousePos, stroke['brush_size'])
     
     # Flip the display
     pygame.display.flip()
