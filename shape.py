@@ -20,14 +20,12 @@ class Circle(Shape):
 
 class Arrow_Forward(Shape):
     def display(self, screen, pos, scale, color):
-        pygame
         pygame.draw.line(screen, color, pygame.Vector2(pos.x, pos.y + scale / 2), pygame.Vector2(pos.x + scale, pos.y + scale / 2), int(scale / 10))
         pygame.draw.line(screen, color, pygame.Vector2(pos.x + scale / 1.5, pos.y + scale / 5), pygame.Vector2(pos.x + scale, pos.y + scale / 2), int(scale / 10))
         pygame.draw.line(screen, color, pygame.Vector2(pos.x + scale / 1.5, pos.y + (scale - scale / 5)), pygame.Vector2(pos.x + scale, pos.y + scale / 2), int(scale / 10))
 
 class Arrow_Backward(Shape):
     def display(self, screen, pos, scale, color):
-        pygame
         pygame.draw.line(screen, color, pygame.Vector2(pos.x, pos.y + scale / 2), pygame.Vector2(pos.x + scale, pos.y + scale / 2), int(scale / 10))
         pygame.draw.line(screen, color, pygame.Vector2(pos.x, pos.y + scale / 2), pygame.Vector2(pos.x + scale - (scale / 1.5), pos.y + scale / 5 ), int(scale / 10))
         pygame.draw.line(screen, color, pygame.Vector2(pos.x, pos.y + scale / 2), pygame.Vector2(pos.x + scale - (scale / 1.5), pos.y + (scale - scale / 5)), int(scale / 10))

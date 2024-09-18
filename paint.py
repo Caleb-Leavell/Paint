@@ -54,7 +54,9 @@ redo_button = button.Button(pygame.Vector2(pygame.display.get_surface().get_widt
 
 #setup
 background_color = (255, 255, 255)
+button_shelf_color = (200, 200, 200)
 screen.fill((255, 255, 255))
+
 
 #loop
 running = True
@@ -91,10 +93,6 @@ while running:
                 screen.fill(background_color)
                 display_strokes(strokes)
 
-
-                
-                
-
     # easy to use variables
     width = pygame.display.get_surface().get_width()
     height = pygame.display.get_surface().get_height()
@@ -102,7 +100,7 @@ while running:
 
     # background - turned off to allow for dynamic rendering, improving performance
 
-    # adding positions to brush if mouse held down
+    # adding positions to brush if mouse held down 
     mousePos = pygame.Vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
     if pygame.mouse.get_pressed()[0] and mouse_pos.y > 50:
         stroke['points'].append(mouse_pos)
@@ -117,7 +115,7 @@ while running:
         draw_line_with_circles(stroke['points'][-2], stroke['points'][-1], stroke['brush_size'], stroke['brush_color'])
 
     #display button tray
-    pygame.draw.rect(screen, (200,200,200), pygame.Rect(0, 0, width, 50))
+    pygame.draw.rect(screen, button_shelf_color, pygame.Rect(0, 0, width, 50))
     plus_button.display(screen)
     minus_button.display(screen)
     black_button.display(screen)
